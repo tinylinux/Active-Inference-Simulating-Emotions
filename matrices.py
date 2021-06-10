@@ -32,4 +32,19 @@ def B_ress(policy):
     for j in range(6):
         M[policy, j] = 1
 
-# Matrice de génération d'outcomes 
+# Matrice d'outcomes vers états
+def A(policy):
+    """
+    Matrice de transition suivant la politique
+    """
+    M = np.zeros((13,4))
+    if policy > 5:
+        M[policy-6, -2] = 1
+        for i in range(4):
+            if not(i == policy - 6):
+                M[i, -1] = 1
+    elif policy == 0:
+        for i in range(4):
+            M[i, 0] = 1
+    elif policy == 1:
+    
