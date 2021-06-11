@@ -6,7 +6,7 @@ import numpy as np
 import scipy as sp
 import matools as mt
 
-def gradF_s(s, o, B, A):
+def gradF_s(s, o, B, A, D):
     """
     Calcul du gradient de F (énergie libre) selon s
     
@@ -50,7 +50,18 @@ def gradF_s(s, o, B, A):
         if t >= n:
             v += np.inner(o[n-1], logA)
         T.append(v)
-    
     return T
 
 
+def gradF_v(s, o, B, A, D):
+    """
+    Calcul du gradient de l'énergie libre suivant la variable v
+    """
+    gs = gradF_s(s, o, B, A, D)
+    L = []
+    for i in range(len(s)):
+        d = np.diag(s[i])
+        c = np.inner(s[i], s[i])
+        v = np.dot((d - c), gs[i])
+        L.append(v)
+    return L
