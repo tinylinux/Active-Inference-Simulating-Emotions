@@ -51,3 +51,4 @@ def logA(A, s, o):
     for i in range(T):
         L += np.kron(o[i], s[i])
     return L
+
