@@ -44,11 +44,14 @@ def logA(A, s, o):
     
     Output
     -------
-        L : matrix
+        matrix
     """
     T = min(len(s), len(o))
-    L = np.matrix(A)
+    a = np.matrix(A)
+    a_0 = a0(A)
     for i in range(T):
-        L += np.kron(o[i], s[i])
-    return L
+        t = np.kron(o[i], s[i])
+        a += t
+        a_0 += t
+    return (psi(a) - psi(a_0))
 
