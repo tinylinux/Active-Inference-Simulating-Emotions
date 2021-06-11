@@ -9,6 +9,7 @@ import scipy as sp
 log = np.log
 gamma = sp.special.gamma
 psi = sp.special.digamma
+softmax = sp.special.softmax
 
 def a0(A):
     """
