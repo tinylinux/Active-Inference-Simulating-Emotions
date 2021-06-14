@@ -3,7 +3,6 @@ Fichier contenant la fonction de calcul du gradient de l'énergie libre
 """
 
 import numpy as np
-import scipy as sp
 import matools as mt
 
 def gradF_s(s, o, B, A, D):
