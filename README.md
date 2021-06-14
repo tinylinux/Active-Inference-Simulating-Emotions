@@ -4,3 +4,4 @@ Il s'agit de l'implémentation du modèle de Friston proposé dans son article "
 * Implémentation en Python
 * Utilisation des modules :
 	* Numpy
+	* Scipy
