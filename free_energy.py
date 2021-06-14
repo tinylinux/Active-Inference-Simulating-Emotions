@@ -4,7 +4,6 @@ Pour le calcul de G, on s'appuie sur l'Appendix D de l'article - A synthesis
 """
 
 import numpy as np
-import scipy as sp
 import matools as mt
 
 def G(A, s, C):
@@ -32,6 +31,7 @@ def G(A, s, C):
     R = np.inner(np.dot(A, s), (np.log(np.dot(A, s)) - np.log(C)))
     return R + np.inner(H, s) - np.inner(np.dot(A, s), np.dot(W, s))
 
+
 def pi(A, s, C, pi):
     """
     Calcul du vecteur de politique pour le choix de l'action
@@ -52,4 +52,7 @@ def pi(A, s, C, pi):
         scalar
             L'énergie libre espérée
     """
-    return mt.softmax(np.array([-1 * G(A[i], s[i], C) for i in range(1, pi+1)]))
+    return mt.softmax(np.array([-1 * G(A[i], s[i], C) for i in range(pi)]))
+
+
+def 
