@@ -11,6 +11,8 @@ gamma = sp.special.gamma
 psi = sp.special.digamma
 softmax = sp.special.softmax
 
+block_diag = sp.linalg.block_diag
+
 def a0(A):
     """
     Calcul de la matrice homogène de A
