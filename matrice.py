@@ -18,6 +18,9 @@ P_R_ANGRY = 8
 P_R_HAPPY = 9
 P_n = 10
 
+# Observations
+N_O = 13
+
 # Matrice de départ
 D = np.loadtxt("matrices/D.m")
 
@@ -26,4 +29,15 @@ B = []
 B_emo = np.loadtxt("matrices/B_emo.m")
 for i in range(P_n):
     Bc = np.loadtxt("matrices/B_" + str(i+1) + ".m")
-    B.append(np.matrix(mt.block_diag(B_emo, Bc)))
+    B.append(Bc)
+
+# Matrice etats/outcomes
+A = []
+for i in range(P_n):
+    Ac = np.loadtxt("matrices/A_" + str(i+1) + ".m")
+    A.append(Ac)
+
+# Vecteur C
+C = np.softmax(np.array([5 for i in range(11)] + [10, 0]))
+
+# Vecteur 
