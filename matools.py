@@ -5,11 +5,14 @@ Module contenant les outils mathématiques qui vont être utilisés
 import numpy as np
 import scipy as sp
 
+from scipy.special import softmax
+from scipy.special import digamma
+from scipy.special import gamma
 
 log = np.log
-gamma = sp.special.gamma
-psi = sp.special.digamma
-softmax = sp.special.softmax
+gamma = gamma
+psi = digamma
+softmax = softmax
 
 block_diag = sp.linalg.block_diag
 
