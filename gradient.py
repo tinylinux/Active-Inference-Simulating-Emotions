@@ -5,7 +5,7 @@ Fichier contenant la fonction de calcul du gradient de l'énergie libre
 import numpy as np
 import matools as mt
 
-def gradF_s(s_emo, s_res, o, B, A, D):
+def gradF_s(s_emo, s_res, o, B_r, B_e, A, D):
     """
     Calcul du gradient de F (énergie libre) selon s
     
@@ -17,8 +17,10 @@ def gradF_s(s_emo, s_res, o, B, A, D):
             Etats internes - Ressentis
         o : [list : vector]
             Observations/ Etats physiologiques
-        B : matrix * matrix
-            Transitions entre états
+        B_r : matrix
+            Transitions entre émotions
+        B_e : matrix
+            Transitions entre actions
         A : matrix
             Lien Etats internes et physiologiques
         D : vector * vector
@@ -62,12 +64,40 @@ def gradF_s(s_emo, s_res, o, B, A, D):
 def gradF_v(s, o, B, A, D):
     """
     Calcul du gradient de l'énergie libre suivant la variable v
+    
+    Input
+    ------
+        s : [list : vector * vector]
+            Etats internes
+        o : [list : vector]
+            Outcomes
+        B : matrix * matrix
+            Transition entre états
+        A : matrix
+            Lien entre états et outcomes
+        D : vector * vector
+            Vecteurs initiaux
+    
+    Output
+    -------
+        [list : vector * vector]
+            Gradient selon s_emotionnel et s_ressenti
     """
-    gs = gradF_s(s, o, B, A, D)
+    s_emo = []
+    s_res = []
+    for k in s:
+        s_emo.append(k[0])
+        s_res.append(k[1])
+    
+    (gse, gsr) = gradF_s(s_emo, s_res, o, B[0], B[1], A, D)
+    
     L = []
     for i in range(len(s)):
-        d = np.diag(s[i])
-        c = np.inner(s[i], s[i])
-        v = np.dot((d - c), gs[i])
-        L.append(v)
+        d_emo = np.diag(s_emo[i])
+        d_res = np.diag(s_res[i])
+        c_emo = np.inner(s_emo[i], s_emo[i])
+        c_res = np.inner(s_res[i], s_res[i])
+        v_emo = np.dot((d_emo - c_emo), gse[i])
+        v_res = np.dot((d_res - d_res), gsr[i])
+        L.append((v_emo, v_res))
     return L
