@@ -16,15 +16,45 @@ softmax = softmax
 
 block_diag = sp.linalg.block_diag
 
+class Shape(Exception):
+    pass
+
+def inner(X, Y):
+    """
+    Le produit inner, défini comme X.Y = X^T Y
+
+    Input
+    ------
+        X : matrix
+        Y : matrix
+
+    Output
+    -------
+        matrix
+    """
+    A = np.matrix(X)
+    B = np.matrix(Y)
+    (a1, a2) = np.shape(A)
+    (b1, b2) = np.shape(B)
+    if (a1 == b1):
+        return np.dot(np.transpose(A), B)
+    elif (a2 == b1):
+        return np.dot(A, B)
+    else:
+        try:
+            raise Shape()
+        except Shape:
+            print("problème de dimension A ", (a1,a2), " et B ", (b1,b2))
+
 def a0(A):
     """
     Calcul de la matrice homogène de A
     ce qui va nous servir pour la partie learning - log A
-    
-    Input 
+
+    Input
     ------
         A : np.matrix
-    
+
     Output
     ------
         S : np.matrix
@@ -41,13 +71,13 @@ def a0(A):
 def logA(A, s, o):
     """
     Calcul du log A d'après les articles d'AI
-    
+
     Input
     ------
         A : matrix
         s : [list : vector]
         o : [list : vector]
-    
+
     Output
     -------
         matrix
@@ -56,8 +86,7 @@ def logA(A, s, o):
     a = np.matrix(A)
     a_0 = a0(A)
     for i in range(T):
-        t = np.kron(o[i], s[i])
+        t = np.kron(o[i], s[i]).reshape((13,4))
         a += t
         a_0 += t
     return (psi(a) - psi(a_0))
-
