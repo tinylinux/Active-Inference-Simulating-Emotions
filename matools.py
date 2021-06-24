@@ -46,6 +46,47 @@ def inner(X, Y):
         except Shape:
             print("problème de dimension A ", (a1,a2), " et B ", (b1,b2))
 
+def norm(A):
+    """
+    Calcul de la norme infinie
+
+    Input
+    -----
+        A : matrix
+            Matrice
+
+    Output
+    ------
+            scalar
+    """
+    D = [np.max(np.abs(k)) for k in A]
+    return np.max(D)
+
+def addmatvec(A, M):
+    """
+    Additionner une matrice colonne et un vecteur
+
+    Input
+    -----
+        M : matrix
+        A : vector
+
+    Output
+    ------
+        vector
+    """
+    k = np.shape(M)
+    v = np.array(A)
+    if k[0] == 1:
+        a = k[1]
+        for i in range(a):
+            v[i] += M[0, i]
+    else:
+        a = k[0]
+        for i in range(a):
+            v[i] += M[i, 0]
+    return v
+
 def a0(A):
     """
     Calcul de la matrice homogène de A
