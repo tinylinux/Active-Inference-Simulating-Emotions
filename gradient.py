@@ -42,7 +42,6 @@ def gradF_s(s_emo, s_res, o, B_r, B_e, A, D):
     ke, kr = np.shape(s_emo[0]), np.shape(s_res[0])
 
     if n > 1:
-        print(np.shape(o[0]), np.shape(logA), np.shape(np.transpose(logA)))
         AS = mt.inner(np.matrix(o[0]), logA)
         v_emo = np.ones(ke) + np.log(s_emo[0]) + AS + mt.inner(np.matrix(s_emo[1]), logB_e) + np.log(D[0])
         v_res = np.ones(kr) + np.log(s_res[0]) + mt.inner(s_res[1], logB_r) + np.log(D[1])
