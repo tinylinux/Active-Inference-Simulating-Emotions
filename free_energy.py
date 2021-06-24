@@ -9,7 +9,7 @@ import matools as mt
 def G(A, s, C):
     """
     Fonction permettant de calculer l'énergie libre espérée
-    
+
     Input
     -----
         A : matrix
@@ -18,7 +18,7 @@ def G(A, s, C):
             Vecteur des états internes
         C : vector
             Vecteur des préférences sur les outcomes
-    
+
     Output
     ------
         scalar
@@ -35,10 +35,10 @@ def G(A, s, C):
 def pi(A, s, C, pi):
     """
     Calcul du vecteur de politique pour le choix de l'action
-    
+
     Input
     -----
-        A : matrix
+        A : [list : matrix]
             Matrice A
         s : [list : vector]
             Vecteur des états internes
@@ -46,13 +46,10 @@ def pi(A, s, C, pi):
             Vecteur des préférences sur les outcomes
         pi : int
             Nombre de politiques
-    
+
     Output
     ------
         scalar
             L'énergie libre espérée
     """
     return mt.softmax(np.array([-1 * G(A[i], s[i], C) for i in range(pi)]))
-
-
-def 
