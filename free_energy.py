@@ -40,7 +40,7 @@ def pi(A, s, C, pi):
     -----
         A : [list : matrix]
             Matrice A
-        s : [list : vector]
+        s : array, dim=2
             Vecteur des états internes
         C : vector
             Vecteur des préférences sur les outcomes
@@ -53,3 +53,24 @@ def pi(A, s, C, pi):
             L'énergie libre espérée
     """
     return mt.softmax(np.array([-1 * G(A[i], s[i], C) for i in range(pi)]))
+
+
+def choose(A, s, C):
+    """
+    Choix de la meilleure politique
+
+    Input
+    -----
+        A : [list : matrix]
+            Matrice A
+        s : array, dim=2
+            Vecteur des états internes
+
+    Output
+    ------
+        int
+            numéro de la politique
+    """
+    q = pi(A, s, C, 9)
+    p = np.argmax(q)
+    return p
