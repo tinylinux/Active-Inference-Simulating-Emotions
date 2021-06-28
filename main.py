@@ -23,6 +23,6 @@ import gradient as grd
 s0_emo = softmax(D[0:4])
 s0_pos = softmax(D[4:])
 
-s = np.zeros((pm.T,pm.N_policy,pm.N_states))
+s = np.zeros((pm.N_policy,pm.T,pm.N_states))
 
 o = ot.get_outcomes()
