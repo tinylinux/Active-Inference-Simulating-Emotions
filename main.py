@@ -7,6 +7,7 @@ from scipy.special import softmax
 import matools as mt
 import free_energy as fe
 import parameters as pm
+import outcomes as ot
 
 A = []
 B_s = [np.loadtxt("matrices/B_1.m")]
@@ -23,3 +24,5 @@ s0_emo = softmax(D[0:4])
 s0_pos = softmax(D[4:])
 
 s = np.zeros((pm.T,pm.N_policy,pm.N_states))
+
+o = ot.get_outcomes()
