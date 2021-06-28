@@ -16,3 +16,10 @@ for i in range(2,11):
     B.append(np.loadtxt("matrices/B_" + str(i) + ".m"))
 D = np.loadtxt("matrices/D.m")
 C = np.loadtxt("matrices/C.m")
+
+import gradient as grd
+
+s0_emo = softmax(D[0:4])
+s0_pos = softmax(D[4:])
+
+s = np.zeros((pm.T,pm.N_policy,pm.N_states))
