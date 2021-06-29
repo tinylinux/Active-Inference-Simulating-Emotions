@@ -24,12 +24,16 @@ def G(A, s, C):
         scalar
             L'énergie libre espérée
     """
-    H = -1 * np.diag(np.inner(A, np.log(A)))
+    H = -1 * np.diag(np.dot(np.transpose(np.matrix(A)), np.matrix(np.log(A))))
     Ainv = np.matrix(np.array(A, dtype='f') ** -1)
     A0inv = np.matrix(np.array(mt.a0(A), dtype='f') ** -1)
     W = 1/2 * (Ainv - A0inv)
-    R = np.inner(np.dot(A, s), (np.log(np.dot(A, s)) - np.log(C)))
-    return R + np.inner(H, s) - np.inner(np.dot(A, s), np.dot(W, s))
+    As = np.dot(A, s)
+    R = np.inner(As, (np.log(As) - np.log(C)))
+    S2 = np.inner(H, s)
+    Ws = np.dot(W, s)
+    S3 = np.inner(As, Ws)
+    return (R + S2 - S3)
 
 
 def pi(A, s, C, pi):
