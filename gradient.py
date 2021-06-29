@@ -102,8 +102,8 @@ def gradF_v(s, o, B, A, D):
     s_emo = []
     s_res = []
     for k in s:
-        s_emo.append(k[0])
-        s_res.append(k[1])
+        s_emo.append(k[0:4])
+        s_res.append(k[4:])
 
     f = gradF_s(s_emo, s_res, o, B[1], B[0], A, D)
 
