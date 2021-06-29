@@ -24,6 +24,7 @@ s0_emo = softmax(D[0:4])
 s0_pos = softmax(D[4:])
 
 s = np.zeros((pm.N_policy,pm.T,pm.N_states))
+s_choosen = np.zeros((pm.T, pm.N_states))
 
 ## Initialisation des états
 for j in range(pm.N_policy):
@@ -51,3 +52,6 @@ for j in range(pm.N_policy):
         print(mt.norm(Gd.reshape((pm.T * 2))))
 
 ## Choix de l'action
+for j in range(pm.T):
+    p = fe.choose(A, s[:,j,0:4], C)
+    s_choosen[j,:] = s[p,j,:]
