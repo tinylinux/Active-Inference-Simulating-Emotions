@@ -4,6 +4,7 @@ Fichier dédié à la récupération des outcomes
 
 import numpy as np
 import parameters as pm
+from scipy.special import softmax
 
 C = np.loadtxt("matrices/C.m")
 
