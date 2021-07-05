@@ -5,6 +5,8 @@ Pour le calcul de G, on s'appuie sur l'Appendix D de l'article - A synthesis
 
 import numpy as np
 import matools as mt
+import display as dp
+import time
 
 def G(A, s, C):
     """
@@ -27,13 +29,15 @@ def G(A, s, C):
     H = -1 * np.diag(np.dot(np.transpose(np.matrix(A)), np.matrix(np.log(A))))
     Ainv = np.matrix(np.array(A, dtype='f') ** -1)
     A0inv = np.matrix(np.array(mt.a0(A), dtype='f') ** -1)
-    W = 1/2 * (Ainv - A0inv)
+    W = 1/2 * mt.subinf(Ainv, A0inv)
     As = np.dot(A, s)
-    R = np.inner(As, (np.log(As) - np.log(C)))
+
+    R = np.inner(As, mt.subinf(np.log(As), np.log(C)))
     S2 = np.inner(H, s)
     Ws = np.dot(W, s)
     S3 = np.inner(As, Ws)
-    return (R + S2 - S3)
+
+    return mt.sub3(R,S2,S3)
 
 
 def pi(A, s, C, pi):
@@ -76,5 +80,5 @@ def choose(A, s, C):
             numéro de la politique
     """
     q = pi(A, s, C, 9)
-    p = np.argmax(q)
+    p = np.argmin(q)
     return p
