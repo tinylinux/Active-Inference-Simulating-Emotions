@@ -109,6 +109,57 @@ def a0(A):
         S[i,:] = s * np.ones(m)
     return S
 
+def sub3(a, b, c):
+    """
+    Opération infinie a + b - c
+    """
+    if a == np.inf and c == np.inf:
+        return b
+    elif a == - np.inf and c == - np.inf:
+        return b
+    elif b == np.inf and c == np.inf:
+        return a
+    elif b == - np.inf and c == - np.inf:
+        return a
+    else:
+        return a + b - c
+
+def subinf(A, B):
+    """
+    Soustraction entre A et B suivant si on a l'infini
+
+    Input
+    -----
+        A : array_like
+        B : array_like
+
+    Output
+    ------
+        array_like
+    """
+    if A.ndim == 1:
+        k = A.shape
+        C = np.zeros(k)
+        k1 = A.size
+        for i in range(k1):
+            if A[i] == np.inf and B[i] == np.inf:
+                C[i] = 0
+            elif A[i] == -np.inf and B[i] == -np.inf:
+                C[i] = 0
+            else:
+                C[i] = A[i] - B[i]
+        return C
+    if A.ndim == 2:
+        (k1, k2) = A.shape
+        C = np.zeros((k1, k2))
+        for i in range(k1):
+            for j in range(k2):
+                if A[i,j] == np.inf and B[i,j] == np.inf:
+                    C[i,j] = 0
+                else:
+                    C[i,j] = A[i,j] - B[i,j]
+        return C
+
 def logA(A, s, o):
     """
     Calcul du log A d'après les articles d'AI
