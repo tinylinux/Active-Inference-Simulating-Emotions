@@ -8,7 +8,7 @@ from scipy.special import softmax
 
 C = np.loadtxt("matrices/C.m")
 
-def gen_random_outcomes(t=3):
+def gen_random_outcomes(t=5):
     """
     Fonction de génération des observations aléatoires
 
@@ -22,17 +22,20 @@ def gen_random_outcomes(t=3):
         [list : vector]
             Listes de distribution sur les Observations
     """
-    L = [np.random.randint(0,2) for i in range(5)]
-    V = np.zeros(N_outcomes)
-    V[-2] = 1
-    for i in range(5):
+    L = [np.random.randint(0,2) for i in range(6)]
+    V = np.zeros(pm.N_outcomes)
+    for i in range(6):
         V[1+2*i] = L[i]
         V[2+2*i] = 1 - L[i]
     O = []
     for i in range(t):
         O.append(np.array(V))
     if t > 0:
-        O[0][0] = 1
+        O[0][0] = 100
+    for i in range(1,t):
+        k = np.random.randint(0,6)
+        O[i][1+2*k] = L[k]*100
+        O[i][2+2*k] = (1-L[k])*100
     return O
 
 def get_outcomes():
