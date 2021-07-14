@@ -62,6 +62,55 @@ def norm(A):
     D = [np.max(np.abs(k)) for k in A]
     return np.max(D)
 
+def xlogx(x):
+    """
+    Calcul de x.log(x)
+    Avec prise en compte de la limite sur 0
+
+    Input
+    -----
+        x : vecteur
+
+    Output
+    ------
+        vecteur
+    """
+    k = np.shape(x)
+    y = np.array(x).flatten()
+    n = np.size(y)
+    for i in range(n):
+        if np.log(y[i]) > -np.inf:
+            y[i] = y[i] * np.log(y[i])
+    D = np.reshape(y, k)
+    return D
+
+def xlogy(x, y):
+    """
+    Calcul de x.log(y)
+    Avec prise en compte de la limite sur 0
+
+    Input
+    -----
+        x : 2D matrix
+        y : 2D matrix
+
+    Output
+    ------
+        2D matrix
+    """
+    (k1, k2) = np.shape(x)
+    (k3, k4) = np.shape(y)
+    if k2 != k3:
+        raise Shape()
+    else:
+        A = np.matrix(np.zeros((k1,k4)))
+        for i in range(k1):
+            for j in range(k4):
+                for k in range(k2):
+                    if np.log(x[i,k]) > - np.inf:
+                        A[i,j] += x[i,k] * np.log(y[k,j])
+        return A
+
 def addmatvec(A, M):
     """
     Additionner une matrice colonne et un vecteur
