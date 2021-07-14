@@ -8,7 +8,7 @@ import matools as mt
 import display as dp
 import time
 
-def G(A, s, C):
+def G(A, s, C, i):
     """
     Fonction permettant de calculer l'énergie libre espérée
 
@@ -26,18 +26,21 @@ def G(A, s, C):
         scalar
             L'énergie libre espérée
     """
-    H = -1 * np.diag(np.dot(np.transpose(np.matrix(A)), np.matrix(np.log(A))))
+    H = -1 * np.diag(mt.xlogy(np.transpose(np.matrix(A)), np.matrix(A)))
     Ainv = np.matrix(np.array(A, dtype='f') ** -1)
     A0inv = np.matrix(np.array(mt.a0(A), dtype='f') ** -1)
     W = 1/2 * mt.subinf(Ainv, A0inv)
     As = np.dot(A, s)
 
-    R = np.inner(As, mt.subinf(np.log(As), np.log(C)))
+    R1 = np.sum(mt.xlogx(As))
+    R2 = np.sum(mt.xlogy(np.matrix(As), np.transpose(np.matrix(C))))
+    # R = np.inner(As, mt.subinf(np.log(As), np.log(C)))
+    R = R1 - R2
     S2 = np.inner(H, s)
     Ws = np.dot(W, s)
     S3 = np.inner(As, Ws)
 
-    return mt.sub3(R,S2,S3)
+    return R + S2
 
 
 def pi(A, s, C, pi):
@@ -60,7 +63,8 @@ def pi(A, s, C, pi):
         scalar
             L'énergie libre espérée
     """
-    return mt.softmax(np.array([-1 * G(A[i], s[i], C) for i in range(pi)]))
+    S = np.array([-1 * G(A[i], s[i], C, i) for i in range(pi)])
+    return (np.argmin(S),mt.softmax(S))
 
 
 def choose(A, s, C):
@@ -79,6 +83,6 @@ def choose(A, s, C):
         int
             numéro de la politique
     """
-    q = pi(A, s, C, 9)
-    p = np.argmin(q)
-    return p
+    (p, q) = pi(A, s, C, 9)
+    #p = np.argmin(q)
+    return (p,q)
