@@ -12,13 +12,15 @@ def import_matrices():
 
     Output
     ------
-        D:  vector
+        D:      vector
             Initial states
-        A:  matrix dict
+        A:      matrix dict
             A matrix (Observation/State) for each action
-        B:  matrix dict
+        B:      matrix dict
             B matrix (States transitions) for each action
-        C:  vector
+        B_emo:  matrix
+            B matrix (States transitions) for emotions
+        C:      vector
             probability of observation
     """
     D = np.loadtxt("matrices/D.txt")
@@ -26,9 +28,11 @@ def import_matrices():
     B = {}
     for k in pm.Policy:
         A[k] = np.matrix(np.loadtxt("matrices/A_" + str(k) + ".txt"))
+        A[k] = A[k][:, 2:4]
         B[k] = np.matrix(np.loadtxt("matrices/B_" + str(k) + ".txt"))
+    B_emo = np.matrix(np.loadtxt("matrices/B_emo.txt"))
     C = np.loadtxt("matrices/C.txt")
-    return (D, A, B, C)
+    return (D, A, B, B_emo, C)
 
 
 def observ_gen(t=pm.T):
