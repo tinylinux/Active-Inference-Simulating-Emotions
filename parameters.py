@@ -29,3 +29,14 @@ N_states_act = 5
 N_states = N_states_emo + N_states_act
 
 N_outcomes = 7
+
+Outcomes = [
+    ' ', 'Start', 'Plaisant', 'Unplaisant',
+    'Approach', 'Avoid',
+    'Correct', 'Incorrect'
+]
+
+States = [
+    ' ', 'Sad', 'Happy',
+    'Start', 'Valence', 'Motivation', 'Report Sad', 'Report Happy'
+]
