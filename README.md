@@ -7,4 +7,3 @@ Il s'agit de l'implémentation du modèle de Friston proposé dans son article "
 	* Scipy
 	* Matplotlib
 
-### Suite à des problèmes dans l'implémentation dans la branch master, on reconsidère entièrement notre modèle et l'implémentation.
