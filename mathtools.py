@@ -22,7 +22,7 @@ block_diag = sp.linalg.block_diag
 class Shape(Exception):
     pass
 
-def o_logA(o, A):
+def o_logA(o, A, debug=False):
     """
     Fonction prenant compte de l'infini calculant
     oT.log(A)
@@ -43,6 +43,8 @@ def o_logA(o, A):
     A = np.matrix(np.log(A))
     (k1, k2) = np.shape(O)
     (k3, k4) = np.shape(A)
+    if debug:
+        print(np.shape(O), " ", np.shape(A))
     if k2 == k3:
         S = np.zeros((k1,k4))
         for i in range(k1):
@@ -56,6 +58,8 @@ def o_logA(o, A):
             Shape()
         except Shape:
             print("Problème de dimension : ", (k1, k2), " avec ", (k3,k4))
+            exit()
+
 
 def logB_s(B, s):
     """
@@ -91,3 +95,31 @@ def logB_s(B, s):
             Shape()
         except Shape:
             print("Problème de dimension : ", (k1, k2), " avec ", (k3,k4))
+
+def get_all_min(L):
+    """
+    Get argmin set of a list
+
+    Input
+    -----
+        L : list
+            List with numbers
+
+    Output
+    ------
+        A : list
+            List with indexes of minimum
+    """
+    A = []
+    h = False
+    for i in range(len(L)):
+        if h == False:
+            A.append(i)
+            h = L[i]
+        elif h > L[i]:
+            h = L[i]
+            A = [i]
+        elif h == L[i]:
+            A.append(i)
+        print(L[i])
+    return A
