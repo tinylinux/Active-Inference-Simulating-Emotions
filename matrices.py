@@ -26,12 +26,18 @@ def import_matrices():
     D = np.loadtxt("matrices/D.txt")
     A = {}
     B = {}
+    C = {}
+    C_imp = softmax(np.loadtxt("matrices/C.txt"))
     for k in pm.Policy:
         A[k] = np.matrix(np.loadtxt("matrices/A_" + str(k) + ".txt"))
         A[k] = A[k][:, 2:4]
         B[k] = np.matrix(np.loadtxt("matrices/B_" + str(k) + ".txt"))
+        s = len(pm.Policy[k])
+        c = np.ones(s)
+        for i in range(s):
+            c[i] = C_imp[pm.Policy[k][i]]
+        C[k] = np.array(c)
     B_emo = np.matrix(np.loadtxt("matrices/B_emo.txt"))
-    C = np.loadtxt("matrices/C.txt")
     return (D, A, B, B_emo, C)
 
 
