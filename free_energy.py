@@ -80,11 +80,10 @@ def fix_s(s, A):
             Vector for each time
     """
     f = np.zeros((pm.T, pm.N_states))
-    f[0, pm.N_states_emo] = 1
     for i in range(pm.T):
         for k in A[i]:
-            f[i, 0:pm.N_states_emo] += s[k, i, 0:pm.N_states_emo]
-            if i < pm.T - 1:
-                f[i+1, pm.N_states_emo + 1 + k] = 1
-        f[i, :] = f[i, :] / len(A[i])
+            f[i, :] += s[k, i, :]
+            #if i < pm.T - 1:
+            #    f[i+1, pm.N_states_emo + 1 + k] = 1
+        #f[i, :] = f[i, :] / len(A[i])
     return f
