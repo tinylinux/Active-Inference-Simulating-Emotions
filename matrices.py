@@ -16,6 +16,8 @@ def import_matrices():
             Initial states
         A:      matrix dict
             A matrix (Observation/State) for each action
+        Af:     matrix
+            A matrix (O/S) for focus (non report) states
         B:      matrix dict
             B matrix (States transitions) for each action
         B_emo:  matrix
@@ -24,13 +26,14 @@ def import_matrices():
             probability of observation
     """
     D = np.loadtxt("matrices/D.txt")
+    Af = np.loadtxt("matrices/Af.txt")
     A = {}
     B = {}
     C = {}
     C_imp = softmax(np.loadtxt("matrices/C.txt"))
     for k in pm.Policy:
         A[k] = np.matrix(np.loadtxt("matrices/A_" + str(k) + ".txt"))
-        A[k] = A[k][:, 2:4]
+        A[k] = A[k][:, 0:4:3]
         B[k] = np.matrix(np.loadtxt("matrices/B_" + str(k) + ".txt"))
         s = len(pm.Policy[k])
         c = np.ones(s)
@@ -38,7 +41,7 @@ def import_matrices():
             c[i] = C_imp[pm.Policy[k][i]]
         C[k] = np.array(c)
     B_emo = np.matrix(np.loadtxt("matrices/B_emo.txt"))
-    return (D, A, B, B_emo, C)
+    return (D, A, Af, B, B_emo, C)
 
 
 def observ_gen(t=pm.T):
@@ -54,12 +57,24 @@ def observ_gen(t=pm.T):
     ------
         O:  matrix
             Matrix of observations
+        Og: matrix
+            Matrix of global observations
     """
     L = [np.random.randint(1, pm.N_outcomes) for i in range(t)]
     O = np.zeros((t, pm.N_outcomes))
-    for i in range(t):
-        O[i, L[i]] = 1
-    return O
+    O[0, 0] = 1
+    O[0, 5] = 1
+    for i in range(1,t):
+        O[i, 2] = 1
+        O[i, 5] = 1
+    D = (pm.N_outcomes - 3)//2 + 3
+    Og = np.zeros((t, D))
+    Og[:, 0] = O[:, 0]
+    for i in range(D-3):
+        Og[:, 1+i] = O[:, i*2 + 1] + O[:, i*2+2]
+    Og[:, -1] = O[:, -1]
+    Og[:, -2] = O[:, -2]
+    return (O, Og)
 
 def get_outcomes():
     """
