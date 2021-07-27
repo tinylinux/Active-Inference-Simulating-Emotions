@@ -41,6 +41,9 @@ def o_logA(o, A, debug=False):
     """
     O = np.matrix(o)
     A = np.matrix(np.log(A))
+    if debug:
+        print(A)
+        print(o)
     (k1, k2) = np.shape(O)
     (k3, k4) = np.shape(A)
     if debug:
@@ -122,4 +125,13 @@ def get_all_min(L):
         elif h == L[i]:
             A.append(i)
         print(L[i])
+    return A
+
+def construct_A_report(s, k):
+    A = np.matrix(np.zeros((2, k)))
+    print(s)
+    for i in range(k):
+        print(s[i])
+        A[0, i] = s[i]
+        A[1, i] = 1 - s[i]
     return A
