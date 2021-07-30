@@ -94,7 +94,6 @@ def gradF_sp(s_emo, s_p, o, Ap, D, B, tau, T):
     for i in range(1, min(T, tau-1)):
         A_rep = mt.construct_A_report(s_emo[i, :], pm.N_states_emo)
         oAf = mt.o_logA(o[i, :-2], Ap)
-        print(A_rep)
         oAr = mt.o_logA(o[i, -2:], A_rep)
         oA = np.concatenate((oAf, oAr), axis=1)
         g[i, :] = 1 + np.log(s_p[i, :]) - oA - mt.o_logA(s_p[i+1, :], B) - mt.logB_s(B,s_p[i-1, :])
@@ -103,9 +102,8 @@ def gradF_sp(s_emo, s_p, o, Ap, D, B, tau, T):
     if tau > T:
         g[tau-1, :] = 1 + np.log(s_p[tau-1, :]) - mt.logB_s(B,s_p[tau-2, :])
     else:
-        A_rep = mt.construct_A_report(s_emo[0, :], pm.N_states_emo)
+        A_rep = mt.construct_A_report(s_emo[-1, :], pm.N_states_emo)
         oAf = mt.o_logA(o[0, :-2], Ap)
-        print(A_rep)
         oAr = mt.o_logA(o[0, -2:], A_rep)
         oA = np.concatenate((oAf, oAr), axis=1)
         g[tau-1, :] = 1 + np.log(s_p[tau-1, :]) - oA - mt.logB_s(B,s_p[tau-2, :])
@@ -147,6 +145,7 @@ def gradF_v(s_emo, s_p, oE, oP, A, Ap, D, B_emo, B_act, tau, T=pm.T):
     """
     f = gradF_s(s_emo, oE, A, D[0:pm.N_states_emo], B_emo, tau, T)
     g = gradF_sp(s_emo, s_p, oP, Ap, D[pm.N_states_emo:], B_act, tau, T)
+
 
     for i in range(tau):
         d_emo = np.diag(s_emo[i, :])
