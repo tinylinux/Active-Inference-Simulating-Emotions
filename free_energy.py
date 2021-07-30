@@ -9,7 +9,7 @@ import display as dp
 import parameters as pm
 import time
 
-def G(s, A, C):
+def G(s, A, C, pol, debug=False):
     """
     Compute free energy for each policy
 
@@ -27,12 +27,15 @@ def G(s, A, C):
         Scalar
             Free energy for a policy
     """
+    Amb = -1 * mt.ambrep(s[0:pm.N_states_emo], s[-1*pm.N_states_emo:], pm.N_states_emo)
     H = - np.diag(mt.o_logA(A, A))
     R1 = np.inner(H, np.matrix(s))
     As = np.dot(A, s)
     R2 = mt.o_logA(As, np.transpose(np.matrix(As)))
     R3 = mt.o_logA(As, np.transpose(np.matrix(C)))
-    return R1 + R2 - R3
+    if debug:
+        print("Policy ", pol, " ", R1, " ", R2-R3)
+    return Amb + R1 + R2 - R3
 
 
 def get_policies(s, A, C):
@@ -57,8 +60,8 @@ def get_policies(s, A, C):
     L = []
     for i in range(pm.T):
         E = []
-        for k in range(len(l)):
-            E.append(G(s[k, i, 0:pm.N_states_emo], A[l[k]], C[l[k]]))
+        for k in range(len(l) - pm.N_states_emo):
+            E.append(G(s[k, i, 0:pm.N_states_emo], A[l[k]], C[l[k]][i, :], l[k]))
         L.append(mt.get_all_min(E))
     return L
 
