@@ -5,22 +5,31 @@ Fichier de module mathématiques
 import numpy as np
 import scipy as sp
 
-from numpy.linalg import norm
-from scipy.special import softmax
+from numpy.linalg import norm as norm
+from scipy.special import softmax as ssoftmax
 from scipy.special import digamma
 from scipy.special import gamma
 
 log = np.log
 gamma = gamma
 psi = digamma
-softmax = softmax
-
-norm = norm
 
 block_diag = sp.linalg.block_diag
 
 class Shape(Exception):
     pass
+
+def softmax(T):
+    S = np.array(T)
+    if np.inf in T:
+        for i in range(len(S)):
+            if T[i] == np.inf:
+                S[i] = 1.0
+            else:
+                S[i] = - np.inf
+        return ssoftmax(S)
+    else:
+        return ssoftmax(T)
 
 def o_logA(o, A, debug=False):
     """
@@ -119,19 +128,67 @@ def get_all_min(L):
         if h == False:
             A.append(i)
             h = L[i]
-        elif h > L[i]:
+        elif h - L[i] > 1e-10:
             h = L[i]
             A = [i]
-        elif h == L[i]:
+        elif -1e-10 < h - L[i] < 1e-10:
             A.append(i)
-        print(L[i])
     return A
 
+
 def construct_A_report(s, k):
+    """
+    Construct A matrix for attentional focus (linked to report)
+
+    Input
+    -----
+        s : vector
+            Emotionnal hidden states
+        k : integer
+            Number of emotionnal states
+
+    Output
+    ------
+        matrix
+            A matrix for report attentional states
+    """
     A = np.matrix(np.zeros((2, k)))
-    print(s)
     for i in range(k):
-        print(s[i])
         A[0, i] = s[i]
         A[1, i] = 1 - s[i]
     return A
+
+
+def ambrep(es, rs, k):
+    """
+    Ambiguity for report states
+
+    Input
+    -----
+        es: vector
+            Emotionnal hidden states
+        rs: vector
+            Report hidden states
+        k:  integer
+            Number of emotions
+
+    Output
+    ------
+        scalar
+            Ambiguity for report states
+    """
+    s = 0
+    for i in range(k):
+        if not(np.log(es[i]) == -np.inf or np.log(1 - es[i]) == -np.inf):
+            s += rs[i] * (es[i] * np.log(es[i]) + (1- es[i]) * np.log(1-es[i]))
+    return s
+
+
+def antinan(a):
+    (m, n) = np.shape(np.matrix(a))
+    S = np.matrix(a)
+    for i in range(m):
+        for j in range(n):
+            if S[i,j] != S[i, j]:
+                S[i,j] = 0
+    return S
