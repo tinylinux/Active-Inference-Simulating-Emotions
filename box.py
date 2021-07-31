@@ -16,12 +16,20 @@ class Observation(object):
     Classe concernant les observations
     """
 
-    def __init__(self, obs=np.matrix([])):
+    def __init__(self, obs=np.matrix([]), global=[]):
         super(Observation, self).__init__()
         self.obs = obs
         (t, outcomes) = np.shape(obs)
         self.time = t
         self.number = outcomes
+        if global == []:
+            self.globs = self.obs
+        else:
+            l = len(global)
+            self.globs = np.matrix(np.zeros((t, l)))
+            for k in range(len(global)):
+                for i in global[k]:
+                    self.globs[:, i] += self.obs[:, i]
 
     def upload(self, file):
         self.obs = np.matrix(np.loadtxt(file))
@@ -32,7 +40,11 @@ class Observation(object):
     def add(self, table):
         T = np.matrix(table)
         (t, outcomes) = np.shape(T)
-        
+        S = np.matrix(np.zeros(self.time + T, outcomes))
+        S[0:self.time, :] = self.obs[:, :]
+        S[self.time:, :] = T[:, :]
+        self.obs = S
+        self.time = self.time + T
 
 
 class ActInf(object):
