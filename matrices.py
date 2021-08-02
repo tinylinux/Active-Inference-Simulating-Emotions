@@ -64,8 +64,11 @@ def observ_gen(t=pm.T):
     O = np.zeros((t, pm.N_outcomes))
     O[0, 0] = 1
     O[0, 5] = 1
-    for i in range(1,t):
+    for i in range(1,3):
+        O[i, 3] = 1
+    for i in range(3, t):
         O[i, 2] = 1
+    for i in range(1, t):
         O[i, 5] = 1
     D = (pm.N_outcomes - 3)//2 + 3
     Og = np.zeros((t, D))
