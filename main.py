@@ -28,20 +28,16 @@ for p in pm.Policy:
     (G, H) = gd.gradF_v(s[i, :, 0:pm.N_states_emo], s[i, :, pm.N_states_emo:], o, Og, A[p], Af, D, B_emo, B[p], pm.T)
     k = 1
     while (mt.norm(G) + mt.norm(H)) > 0.0001:
+        print(mt.norm(G), mt.norm(H))
         k += 1
         s[i, :, 0:pm.N_states_emo] = s[i, :, 0:pm.N_states_emo] - 1/k * G
         s[i, :, pm.N_states_emo:] = s[i, :, pm.N_states_emo:] - 1/k * H
         for h in range(pm.T):
             s[i, h, 0:pm.N_states_emo] = mt.softmax(k*10* s[i, h, 0:pm.N_states_emo])
             s[i, h, pm.N_states_emo:] = mt.softmax(k*20 * s[i, h, pm.N_states_emo:])
-        if i == 1:
-            print(H[1:3, :])
-            print(s[i, 1:3, pm.N_states_emo:])
         (G, H) = gd.gradF_v(s[i, :, 0:pm.N_states_emo], s[i, :, pm.N_states_emo:], o, Og, A[p], Af, D, B_emo, B[p], pm.T)
         G = mt.antinan(G)
         H = mt.antinan(H)
-        print(H)
-        print(mt.norm(H))
     i += 1
 
 fs = np.ones((pm.T, pm.N_states)) # Final states
@@ -56,4 +52,4 @@ for i in range(pm.N_policy):
 Actions = fe.get_policies(s, A, Op)
 fs = fe.fix_s(s, Actions)
 #dp.plot_states(np.transpose(fs), "Hidden states")
-dp.plot_all(fs, O)
+dp.plot_all(fs, O, "Observation & Etats")
