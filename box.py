@@ -158,16 +158,20 @@ class ActInf(object):
         Number of policies
     obs :           observations
         Observations for this entity
-    A:      matrix dict
+    A:              matrix dict
         A matrix (Observation/State) for each action
-    Af:     matrix
+    Af:             matrix
         A matrix (O/S) for focus (non report) states
-    B:      matrix dict
+    B:              matrix dict
         B matrix (States transitions) for each action
-    B_emo:  matrix
+    B_emo:          matrix
         B matrix (States transitions) for emotions
-    D:      vector
+    D:              vector
         Initial states probabilities
+    fstates:        matrix (integer * integer -> float)
+        Final states after choosing policies
+    labels:         string list
+        Name of outcomes
     """
 
     def __init__(self):
@@ -181,6 +185,7 @@ class ActInf(object):
         self.N_states = 0
         self.N_policy = 0
         self.states = np.matrix([])
+        self.fstates = np.matrix([])
         self.policy = {}
         self.A = {}
         self.Af = np.matrix([])
@@ -220,10 +225,11 @@ class ActInf(object):
         self.N_states_act = nacts
         self.N_states = self.N_states_emo + self.N_states_act
         self.time = t
-        self.states = np.matrix(np.zeros((self.N_policy, t, self.N_states)))
+        self.states = np.matrix(pm.epsilon * np.ones((self.N_policy, t, self.N_states)))
+        self.fstates = np.matrix(pm.epsilon * np.ones((t, self.N_states)))
         for i in range(self.N_policy):
             for j in range(t):
-                self.states[i, j, :] = D[:]
+                self.states[i, j, :] += D[:]
 
     def upd_obs(self, obs):
         """
@@ -241,7 +247,7 @@ class ActInf(object):
         """
         self.obs = obs
         if obs.time > self.time:
-            S = np.matrix(np.zeros(self.N_policy, obs.time, self.N_states))
+            S = np.matrix(pm.epsilon * np.ones(self.N_policy, obs.time, self.N_states))
             S[:, 0:self.time, :] = self.states[:, :, :]
             self.time = T
 
@@ -289,3 +295,31 @@ class ActInf(object):
         if B_emo != None:
             self.B_emo = B_emo
         self.D = D
+
+        def set_labels(self, labels=[]):
+            """
+            Set names of states. (For displaying)
+
+            Input
+            -----
+            labels: string list
+                Name of states
+            """
+            self.labels = [''] + labels
+
+        def display_graph(self, title="Observations & States", alld=True):
+            """
+            Display states via matplotlib interface
+
+            Input
+            -----
+            title:  string
+                Name of the figure
+            alld:   boolean
+                Display states graph or states&observations graph
+            """
+            if alld:
+                dp.plot_all(self.states, self.obs.obs, title, \
+                    self.labels, self.obs.labels)
+            else:
+                dp.plot_states(self.states, title, self.labels)
