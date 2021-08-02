@@ -27,11 +27,13 @@ class Observation(object):
         List of policy to separate observations by attentional focus
     obsglob:    dict (integer -> matrix)
         Observations according a attentional focus
+    obsreg:     matrix (integer * integer -> float)
+        Observation regrouping for each focus
     labels:     string list
         Name of outcomes
     """
 
-    def __init__(self, obs=np.matrix([]), globalo=None):
+    def __init__(self, obs=np.matrix([]), globalo=None, obsr=np.matrix([])):
         """
         Initialization of observation
 
@@ -50,7 +52,9 @@ class Observation(object):
         if globalo == None:
             self.globs = None
             self.obsglob = {0 : self.obs}
+            self.obsreg = self.obs
         else:
+            self.obsreg = obsr
             self.globs = globalo
             self.obsglob = {}
             for k in globalo:
@@ -79,7 +83,7 @@ class Observation(object):
             self.obsglob = {}
             for k in self.globs:
                 l = len(self.globs[k])
-                o = np.matrix(np.zeros((t, l)))
+                o = np.matrix(pm.epsilon * np.ones((t, l)))
                 for h in range(l):
                     o[:, h] += self.obs[:, self.globs[k][h]]
                 self.obsglob[k] = np.matrix(o)
@@ -227,11 +231,12 @@ class ActInf(object):
         self.N_states_act = nacts
         self.N_states = self.N_states_emo + self.N_states_act
         self.time = t
-        self.states = np.matrix(pm.epsilon * np.ones((self.N_policy, t, self.N_states)))
-        self.fstates = np.matrix(pm.epsilon * np.ones((t, self.N_states)))
+        self.states = np.ones((self.N_policy, t, self.N_states))
+        self.states[:,:,0:self.N_states_emo] = self.states[:,:,0:self.N_states_emo]/self.N_states_emo
+        self.states[:,:,self.N_states_emo:] = self.states[:,:,self.N_states_emo:]/self.N_states_act
+        self.fstates = pm.epsilon * np.ones((t, self.N_states))
         for i in range(self.N_policy):
-            for j in range(t):
-                self.states[i, j, :] += D[:]
+            self.states[i, 0, :] = D[:]
 
 
     def upd_obs(self, obs):
@@ -280,85 +285,87 @@ class ActInf(object):
         D:      vector
             Initial states probabilities
         """
-        if Af != None:
+        if type(Af) != type(None):
             self.Af = Af
-        if A != None:
+        if type(A) != type(None):
             for k in A:
                 if k in self.policy.keys():
                     self.A[k] = A[k]
                 else:
                     print("Warning: Be careful with ", k, \
                         " index in A dict, it's not in policies list")
-        if B != None:
+        if type(B) != type(None):
             for k in B:
                 if k in self.policy.keys():
                     self.B[k] = B[k]
                 else:
                     print("Warning: Be careful with ", k, \
                         " index in B dict, it's not in policies list")
-        if B_emo != None:
+        if type(B_emo) != type(None):
             self.B_emo = B_emo
         self.D = D
 
-
-        def belief_updating(self):
-            i = 0
-            for p in self.policy:
+    def belief_updating(self):
+        i = 0
+        for p in self.policy:
+            (G, H) = gd.gradF_v(self.states[i, :, 0:self.N_states_emo], \
+                        self.states[i, :, self.N_states_emo:], \
+                        self.obs.obsglob[p], self.obs.obsreg, \
+                        self.A[p], self.Af, self.D, self.B_emo, self.B[p], \
+                        self.time, self.obs.time, self.N_states_emo)
+            G = mt.antinan(G)
+            H = mt.antinan(H)
+            k = 1
+            while (mt.norm(G) + mt.norm(H)) > 0.0001:
+                k += 1
+                self.states[i, :, 0:self.N_states_emo] = self.states[i, :, 0:self.N_states_emo] - 1/k * G
+                self.states[i, :, self.N_states_emo:] = self.states[i, :, self.N_states_emo:] - 1/k * H
+                for h in range(self.time):
+                    self.states[i,h, 0:self.N_states_emo] = mt.softmax(k*10* self.states[i, h, 0:self.N_states_emo])
+                    self.states[i, h, self.N_states_emo:] = mt.softmax(k*20 * self.states[i, h, self.N_states_emo:])
                 (G, H) = gd.gradF_v(self.states[i, :, 0:self.N_states_emo], \
                             self.states[i, :, self.N_states_emo:], \
-                            self.obs.obs, self.obs.obsglob[p], \
+                            self.obs.obsglob[p], self.obs.obsreg, \
                             self.A[p], self.Af, self.D, self.B_emo, self.B[p], \
                             self.time, self.obs.time, self.N_states_emo)
                 G = mt.antinan(G)
                 H = mt.antinan(H)
-                k = 1
-                while (mt.norm(G) + mt.norm(H)) > 1e-4:
-                    k += 1
-                    self.states[i,h, 0:self.N_states_emo] = mt.softmax(k*10* self.states[i, h, 0:self.N_states_emo])
-                    self.states[i, h, self.N_states_emo:] = mt.softmax(k*20 * self.states[i, h, self.N_states_emo:])
-                    (G, H) = gd.gradF_v(self.states[i, :, 0:self.N_states_emo], \
-                                self.states[i, :, self.N_states_emo:], \
-                                self.obs.obs, self.obs.obsglob[p], \
-                                self.A[p], self.Af, self.D, self.B_emo, self.B[p], \
-                                self.time, self.obs.time, self.N_states_emo)
-                    G = mt.antinan(G)
-                    H = mt.antinan(H)
-                i += 1
+            i += 1
 
-        def choose_policy(self):
-            """
-            Method to create the sequence of policies
-            """
-            act = fe.get_polices(self.states, self.A, self.obs.obsglob, \
-                                self.policy, self.time, self.N_states_emo)
-            self.fstates = fe.fix_s(self.states, act, \
-                                    self.time, self.N_states_emo)
+    def choose_policy(self):
+        """
+        Method to create the sequence of policies
+        """
+        act = fe.get_policies(self.states, self.A, self.obs.obsglob, \
+                            self.policy, self.time, self.N_states_emo)
+        self.fstates = fe.fix_s(self.states, act, \
+                                self.time, self.N_states)
 
 
-        def set_labels(self, labels=[]):
-            """
-            Set names of states. (For displaying)
+    def set_labels(self, labels=[]):
+        """
+        Set names of states. (For displaying)
 
-            Input
-            -----
-            labels: string list
-                Name of states
-            """
-            self.labels = [''] + labels
+        Input
+        -----
+        labels: string list
+            Name of states
+        """
+        self.labels = [''] + labels
 
-        def display_graph(self, title="Observations & States", alld=True):
-            """
-            Display states via matplotlib interface
+    def display_graph(self, title="Observations & States", alld=True):
+        """
+        Display states via matplotlib interface
 
-            Input
-            -----
-            title:  string
-                Name of the figure
-            alld:   boolean
-                Display states graph or states&observations graph
-            """
-            if alld:
-                dp.plot_all(self.fstates, self.obs.obs, title, \
-                    self.labels, self.obs.labels)
-            else:
-                dp.plot_states(self.states, title, self.labels)
+        Input
+        -----
+        title:  string
+            Name of the figure
+        alld:   boolean
+            Display states graph or states&observations graph
+        """
+        if alld:
+            dp.plot_all(self.fstates, self.obs.obs, title, \
+                self.labels, self.obs.labels)
+        else:
+            dp.plot_states(self.states, title, self.labels)
