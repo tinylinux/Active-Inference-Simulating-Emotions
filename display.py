@@ -7,12 +7,24 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import parameters as pm
 
-def plot_states(s, title):
+def plot_states(s, title, labels=pm.States):
     name = "gray"
-    plt.matshow(s, cmap=plt.get_cmap(name))
-    plt.title(title)
-    plt.colorbar()
+
+    fig, (ax1) = plt.subplots(1,1)
+    fig.suptitle(title, fontsize=20)
+
+    im1 = ax1.imshow(np.transpose(s), cmap=plt.get_cmap(name), aspect='auto')
+    divider1 = make_axes_locatable(ax1)
+    cax1 = divider1.append_axes("right", size="5%", pad=0.05)
+    cbar1 = plt.colorbar(im1, cax=cax1)
+    ax1.xaxis.set_visible(False)
+    ax1.set_yticklabels(labels)
+
+    plt.tight_layout()
+    # Make space for title
+    plt.subplots_adjust(top=0.85)
     plt.show()
+
 
 def plot_all(s, o):
     name = "gray"
