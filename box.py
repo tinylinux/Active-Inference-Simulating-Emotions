@@ -193,6 +193,7 @@ class ActInf(object):
         self.B_emo = np.matrix([])
         self.obs = Observation()
 
+
     def set_policy(self, policy):
         """
         Set policies
@@ -204,6 +205,7 @@ class ActInf(object):
         """
         self.policy = policy
         self.N_policy = len(policy.keys())
+
 
     def set_states(self, emotions, nacts, t, D):
         """
@@ -231,6 +233,7 @@ class ActInf(object):
             for j in range(t):
                 self.states[i, j, :] += D[:]
 
+
     def upd_obs(self, obs):
         """
         Update observations
@@ -250,6 +253,7 @@ class ActInf(object):
             S = np.matrix(pm.epsilon * np.ones(self.N_policy, obs.time, self.N_states))
             S[:, 0:self.time, :] = self.states[:, :, :]
             self.time = T
+
 
     def set_matrices(self, A=None, Af=None, B=None, B_emo=None, D=pm.D):
         """
@@ -295,6 +299,34 @@ class ActInf(object):
         if B_emo != None:
             self.B_emo = B_emo
         self.D = D
+
+
+        def belief_updating(self):
+            i = 0
+            for p in self.policy:
+                (G, H) = gd.gradF_v(self.states[i, :, 0:self.N_states_emo], \
+                            self.states[i, :, self.N_states_emo:], \
+                            self.obs.obs, self.obs.obsglob[p], \
+                            self.A[p], self.Af, self.D, self.B_emo, self.B[p], \
+                            self.time, self.obs.time, self.N_states_emo)
+                G = mt.antinan(G)
+                H = mt.antinan(H)
+                k = 1
+                while (mt.norm(G) + mt.norm(H)) > 1e-4:
+                    k += 1
+                    self.states[i,h, 0:self.N_states_emo] = mt.softmax(k*10* self.states[i, h, 0:self.N_states_emo])
+                    self.states[i, h, self.N_states_emo:] = mt.softmax(k*20 * self.states[i, h, self.N_states_emo:])
+                    (G, H) = gd.gradF_v(self.states[i, :, 0:self.N_states_emo], \
+                                self.states[i, :, self.N_states_emo:], \
+                                self.obs.obs, self.obs.obsglob[p], \
+                                self.A[p], self.Af, self.D, self.B_emo, self.B[p], \
+                                self.time, self.obs.time, self.N_states_emo)
+                    G = mt.antinan(G)
+                    H = mt.antinan(H)
+                i += 1
+
+
+
 
         def set_labels(self, labels=[]):
             """
