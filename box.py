@@ -325,7 +325,14 @@ class ActInf(object):
                     H = mt.antinan(H)
                 i += 1
 
-
+        def choose_policy(self):
+            """
+            Method to create the sequence of policies
+            """
+            act = fe.get_polices(self.states, self.A, self.obs.obsglob, \
+                                self.policy, self.time, self.N_states_emo)
+            self.fstates = fe.fix_s(self.states, act, \
+                                    self.time, self.N_states_emo)
 
 
         def set_labels(self, labels=[]):
@@ -351,7 +358,7 @@ class ActInf(object):
                 Display states graph or states&observations graph
             """
             if alld:
-                dp.plot_all(self.states, self.obs.obs, title, \
+                dp.plot_all(self.fstates, self.obs.obs, title, \
                     self.labels, self.obs.labels)
             else:
                 dp.plot_states(self.states, title, self.labels)
