@@ -9,7 +9,7 @@ import display as dp
 import parameters as pm
 import time
 
-def G(s, A, C, pol, debug=False):
+def G(s, A, C, pol, nemo=pm.N_states_emo , debug=False):
     """
     Compute free energy for each policy
 
@@ -27,7 +27,7 @@ def G(s, A, C, pol, debug=False):
         Scalar
             Free energy for a policy
     """
-    Amb = -1 * mt.ambrep(s[0:pm.N_states_emo], s[-1*pm.N_states_emo:], pm.N_states_emo)
+    Amb = -1 * mt.ambrep(s[0:nemo], s[-1*nemo:], nemo)
     H = - np.diag(mt.o_logA(A, A))
     R1 = np.inner(H, np.matrix(s))
     As = np.dot(A, s)
@@ -38,35 +38,41 @@ def G(s, A, C, pol, debug=False):
     return Amb + R1 + R2 - R3
 
 
-def get_policies(s, A, C):
+def get_policies(s, A, C, pol=pm.Policy, t=pm.T, nemo=pm.N_states_emo):
     """
     Compute policy at each time
 
     Input
     -----
-        s : vector
+        s :     vector
             Emotionnal hidden states
-        A : Dict of Matrix
+        A :     Dict of Matrix
             Probability of outcomes knowing states for each policy
-        C : Dict of Vector
+        C :     Dict of Vector
             Probability of outcomes for each policy
+        pol :   Dict of List
+            Policies
+        t :     Integer
+            Time of emotions
+        nemo :  integer
+            Number of emotional states
 
     Output
     ------
         List of List of int
             Policies for each time
     """
-    l = list(pm.Policy.keys())
+    l = list(pol.keys())
     L = []
-    for i in range(pm.T):
+    for i in range(t):
         E = []
-        for k in range(len(l) - pm.N_states_emo):
-            E.append(G(s[k, i, 0:pm.N_states_emo], A[l[k]], C[l[k]][i, :], l[k]))
+        for k in range(len(l) - nemo):
+            E.append(G(s[k, i, 0:nemo], A[l[k]], C[l[k]][i, :], l[k]))
         L.append(mt.get_all_min(E))
     return L
 
 
-def fix_s(s, A):
+def fix_s(s, A, t=pm.T, n=pm.N_states):
     """
     Create states for each time
 
@@ -76,14 +82,18 @@ def fix_s(s, A):
             Emotionnal hidden states
         A : List of List of int
             List of policies for each time
+        t : integer
+            Time of experience
+        n : integer
+            Number of states
 
     Output
     ------
         Vector
             Vector for each time
     """
-    f = np.zeros((pm.T, pm.N_states))
-    for i in range(pm.T):
+    f = np.zeros((t, n))
+    for i in range(t):
         for k in A[i]:
             f[i, :] += s[k, i, :]
             #if i < pm.T - 1:
