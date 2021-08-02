@@ -36,6 +36,14 @@ class Observation(object):
         (t, outcomes) = np.shape(self.obs)
         self.time = t
         self.number = outcomes
+        if global == []:
+            self.globs = self.obs
+        else:
+            l = len(global)
+            self.globs = np.matrix(np.zeros((t, l)))
+            for k in range(len(global)):
+                for i in global[k]:
+                    self.globs[:, i] += self.obs[:, i]
 
     def add(self, table):
         T = np.matrix(table)
@@ -70,6 +78,16 @@ class ActInf(object):
         Number of policies
     obs :           observations
         Observations for this entity
+    A:      matrix dict
+        A matrix (Observation/State) for each action
+    Af:     matrix
+        A matrix (O/S) for focus (non report) states
+    B:      matrix dict
+        B matrix (States transitions) for each action
+    B_emo:  matrix
+        B matrix (States transitions) for emotions
+    D:      vector
+        Initial states probabilities
     """
 
     def __init__(self):
@@ -78,11 +96,17 @@ class ActInf(object):
         """
         super(ActInf, self).__init__()
         self.time = 0
-        self.N_states_emo = 1
-        self.N_states_act = 1
-        self.N_states = 2
-        self.N_policy = 1
+        self.N_states_emo = 0
+        self.N_states_act = 0
+        self.N_states = 0
+        self.N_policy = 0
         self.states = np.matrix([])
+        self.policy = {}
+        self.A = {}
+        self.Af = np.matrix([])
+        self.B = {}
+        self.B_emo = np.matrix([])
+        self.obs = Observation()
 
     def set_policy(self, policy):
         """
@@ -125,6 +149,11 @@ class ActInf(object):
         """
         Update observations
 
+        Warning
+        -------
+            It doesn't duplicate the observations.
+            Be careful when you change the variable of the observation entity.
+
         Input
         -----
         obs :     observation
@@ -135,3 +164,48 @@ class ActInf(object):
             S = np.matrix(np.zeros(self.N_policy, obs.time, self.N_states))
             S[:, 0:self.time, :] = self.states[:, :, :]
             self.time = T
+
+    def set_matrices(self, A=None, Af=None, B=None, B_emo=None, D=pm.D):
+        """
+        Set matrices for transition and observations.
+
+        Warning
+        -------
+            It doesn't duplicate the matrix.
+            Be careful when you change the variable of the matrix root
+            If you intend to change your matrix variable, create a duplicate
+            of this (with `np.matrix` command) like :
+                `I.set_matrices(np.matrix(A), ...)`
+
+        Input
+        -----
+        A:      matrix dict
+            A matrix (Observation/State) for each action
+        Af:     matrix
+            A matrix (O/S) for focus (non report) states
+        B:      matrix dict
+            B matrix (States transitions) for each action
+        B_emo:  matrix
+            B matrix (States transitions) for emotions
+        D:      vector
+            Initial states probabilities
+        """
+        if Af != None:
+            self.Af = Af
+        if A != None;
+            for k in A:
+                if k in self.policy.keys():
+                    self.A[k] = A[k]
+                else:
+                    print("Warning: Be careful with ", k, \
+                        " index in A dict, it's not in policies list")
+        if B != None:
+            for k in B:
+                if k in self.policy.keys():
+                    self.B[k] = B[k]
+                else:
+                    print("Warning: Be careful with ", k, \
+                        " index in B dict, it's not in policies list")
+        if B_emo != None:
+            self.B_emo = B_emo
+        self.D = D
