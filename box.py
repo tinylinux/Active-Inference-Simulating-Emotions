@@ -31,15 +31,15 @@ class Observation(object):
         Name of outcomes
     """
 
-    def __init__(self, obs=np.matrix([]), global={}):
+    def __init__(self, obs=np.matrix([]), globalo=None):
         """
         Initialization of observation
 
         Input
         -----
-        obs:    matrix
+        obs:        matrix
             Observations
-        global: dict (integer -> integer list)
+        globalo:    dict (integer -> integer list)
             List of policy to separate observations by attentional focus
         """
         super(Observation, self).__init__()
@@ -47,17 +47,17 @@ class Observation(object):
         (t, outcomes) = np.shape(obs)
         self.time = t
         self.number = outcomes
-        if global == {}:
-            self.globs = {}
+        if globalo == None:
+            self.globs = None
             self.obsglob = {0 : self.obs}
         else:
-            self.globs = global
+            self.globs = globalo
             self.obsglob = {}
-            for k in global:
-                l = len(global[k])
+            for k in globalo:
+                l = len(globalo[k])
                 o = np.matrix(pm.epsilon * np.ones((t, l)))
                 for h in range(l):
-                    o[:, h] += self.obs[:, global[k][h]]
+                    o[:, h] += self.obs[:, globalo[k][h]]
                 self.obsglob[k] = np.matrix(o)
 
     def upload(self, file):
@@ -282,7 +282,7 @@ class ActInf(object):
         """
         if Af != None:
             self.Af = Af
-        if A != None;
+        if A != None:
             for k in A:
                 if k in self.policy.keys():
                     self.A[k] = A[k]
