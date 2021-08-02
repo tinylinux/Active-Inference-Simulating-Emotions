@@ -43,3 +43,6 @@ States = [
 
 # Default D matrix
 D = np.loadtxt("matrices/D.txt")
+
+# Epsilon to
+epsilon = 1e-5
