@@ -40,3 +40,6 @@ States = [
     ' ', 'Sad', 'Happy',
     'Start', 'Valence', 'Motivation', 'Report Sad', 'Report Happy'
 ]
+
+# Default D matrix
+D = np.loadtxt("matrices/D.txt")
