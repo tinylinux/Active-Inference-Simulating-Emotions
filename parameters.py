@@ -2,6 +2,8 @@
 Fichier où sont definis les paramètres
 """
 
+import numpy as np
+
 T = 5
 
 Policy = {
