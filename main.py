@@ -51,7 +51,7 @@ fs = np.ones((pm.T, pm.N_states)) # Final states
 #        print(fe.G(s[0, t, 0:pm.N_states_emo], A[k], C[k]))
 
 for i in range(pm.N_policy):
-    dp.plot_states(np.transpose(s[i, :, :]), "Policy " + str(i))
+    dp.plot_states(s[i, :, :], "Policy " + str(i))
 
 Actions = fe.get_policies(s, A, Op)
 fs = fe.fix_s(s, Actions)
