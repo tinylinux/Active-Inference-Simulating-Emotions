@@ -14,38 +14,83 @@ import free_energy as fe
 class Observation(object):
     """
     Classe concernant les observations
+
+    Attributes
+    ----------
+    obs:    matrix
+        Observations
+    time:   integer
+        Time of observations
+    number: integer
+        Number of outcomes
+    globs: dict (integer -> integer list)
+        List of policy to separate observations by attentional focus
+    obsglob:  dict (integer -> matrix)
+        Observations according a attentional focus
     """
 
-    def __init__(self, obs=np.matrix([]), global=[]):
+    def __init__(self, obs=np.matrix([]), global={}):
+        """
+        Initialization of observation
+
+        Input
+        -----
+        obs:    matrix
+            Observations
+        global: dict (integer -> integer list)
+            List of policy to separate observations by attentional focus
+        """
         super(Observation, self).__init__()
-        self.obs = obs
+        self.obs = np.matrix(obs)
         (t, outcomes) = np.shape(obs)
         self.time = t
         self.number = outcomes
-        if global == []:
-            self.globs = self.obs
+        if global == {}:
+            self.globs = {}
+            self.obsglob = {0 : self.obs}
         else:
-            l = len(global)
-            self.globs = np.matrix(np.zeros((t, l)))
-            for k in range(len(global)):
-                for i in global[k]:
-                    self.globs[:, i] += self.obs[:, i]
+            self.globs = global
+            self.obsglob = {}
+            for k in global:
+                l = len(global[k])
+                o = np.matrix(pm.epsilon * np.ones((t, l)))
+                for h in range(l):
+                    o[:, h] += self.obs[:, global[k][h]]
+                self.obsglob[k] = np.matrix(o)
 
     def upload(self, file):
+        """
+        Upload observations from a file
+
+        Input
+        -----
+        file:   string (path)
+            Path of a observation file
+        """
         self.obs = np.matrix(np.loadtxt(file))
         (t, outcomes) = np.shape(self.obs)
         self.time = t
         self.number = outcomes
-        if global == []:
-            self.globs = self.obs
+        if self.globs == {}:
+            self.obsglob = {0 : self.obs}
         else:
-            l = len(global)
-            self.globs = np.matrix(np.zeros((t, l)))
-            for k in range(len(global)):
-                for i in global[k]:
-                    self.globs[:, i] += self.obs[:, i]
+            self.obsglob = {}
+            for k in self.globs:
+                l = len(self.globs[k])
+                o = np.matrix(np.zeros((t, l)))
+                for h in range(l):
+                    o[:, h] += self.obs[:, self.globs[k][h]]
+                self.obsglob[k] = np.matrix(o)
 
     def add(self, table):
+        """
+        Add an observation for a period
+
+        Input
+        -----
+        table:  matrix
+            Observations done after saved observations
+        """
         T = np.matrix(table)
         (t, outcomes) = np.shape(T)
         S = np.matrix(np.zeros(self.time + T, outcomes))
@@ -53,6 +98,16 @@ class Observation(object):
         S[self.time:, :] = T[:, :]
         self.obs = S
         self.time = self.time + T
+        if self.globs == {}:
+            self.obsglob = {0 : self.obs}
+        else:
+            self.obsglob = {}
+            for k in self.globs:
+                l = len(self.globs[k])
+                o = np.matrix(np.zeros((t, l)))
+                for h in range(l):
+                    o[:, h] += self.obs[:, self.globs[k][h]]
+                self.obsglob[k] = np.matrix(o)
 
 
 class ActInf(object):
