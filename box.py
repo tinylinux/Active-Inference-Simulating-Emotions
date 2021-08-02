@@ -17,16 +17,18 @@ class Observation(object):
 
     Attributes
     ----------
-    obs:    matrix
+    obs:        matrix
         Observations
-    time:   integer
+    time:       integer
         Time of observations
-    number: integer
+    number:     integer
         Number of outcomes
-    globs: dict (integer -> integer list)
+    globs:      dict (integer -> integer list)
         List of policy to separate observations by attentional focus
-    obsglob:  dict (integer -> matrix)
+    obsglob:    dict (integer -> matrix)
         Observations according a attentional focus
+    labels:     string list
+        Name of outcomes
     """
 
     def __init__(self, obs=np.matrix([]), global={}):
@@ -108,6 +110,29 @@ class Observation(object):
                 for h in range(l):
                     o[:, h] += self.obs[:, self.globs[k][h]]
                 self.obsglob[k] = np.matrix(o)
+
+    def set_labels(self, labels=[]):
+        """
+        Set names of outcomes.
+        (For displaying)
+
+        Input
+        -----
+        labels: string list
+            Name of outcomes
+        """
+        self.labels = [''] + labels
+
+    def display_graph(self, title="Observations"):
+        """
+        Display outcomes via matplotlib interface
+
+        Input
+        -----
+        title: string
+            Name of the figure
+        """
+        dp.plot_states(self.obs, title, self.labels)
 
 
 class ActInf(object):
