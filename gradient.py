@@ -52,7 +52,7 @@ def gradF_s(s_emo, o, A, D, B_emo, tau, T):
     return g
 
 
-def gradF_sp(s_emo, s_p, o, Ap, D, B, tau, T):
+def gradF_sp(s_emo, s_p, o, Ap, D, B, tau, T, nemo):
     """
     Gradiant according to attentional focus states
 
@@ -72,6 +72,8 @@ def gradF_sp(s_emo, s_p, o, Ap, D, B, tau, T):
             Time of states
         T :     integer
             Time of observations
+        nemo:   integer
+            Number of emotional states
 
     Output
     ------
@@ -86,13 +88,13 @@ def gradF_sp(s_emo, s_p, o, Ap, D, B, tau, T):
         if T <= 0:
             g[0, :] = 1 + np.log(s_p[0, :]) - np.log(D) - mt.o_logA(s_p[1, :], B)
         else:
-            A_rep = mt.construct_A_report(s_emo[0, :], pm.N_states_emo)
+            A_rep = mt.construct_A_report(s_emo[0, :], nemo)
             oAf = mt.o_logA(o[0, :-2], Ap)
             oAr = mt.o_logA(o[0, -2:], A_rep)
             oA = np.concatenate((oAf, oAr), axis=1)
             g[0, :] = 1 + np.log(s_p[0, :]) - oA - np.log(D) - mt.o_logA(s_p[1, :], B)
     for i in range(1, min(T, tau-1)):
-        A_rep = mt.construct_A_report(s_emo[i, :], pm.N_states_emo)
+        A_rep = mt.construct_A_report(s_emo[i, :], nemo)
         oAf = mt.o_logA(o[i, :-2], Ap)
         oAr = mt.o_logA(o[i, -2:], A_rep)
         oA = np.concatenate((oAf, oAr), axis=1)
@@ -102,14 +104,14 @@ def gradF_sp(s_emo, s_p, o, Ap, D, B, tau, T):
     if tau > T:
         g[tau-1, :] = 1 + np.log(s_p[tau-1, :]) - mt.logB_s(B,s_p[tau-2, :])
     else:
-        A_rep = mt.construct_A_report(s_emo[-1, :], pm.N_states_emo)
+        A_rep = mt.construct_A_report(s_emo[-1, :], nemo)
         oAf = mt.o_logA(o[0, :-2], Ap)
         oAr = mt.o_logA(o[0, -2:], A_rep)
         oA = np.concatenate((oAf, oAr), axis=1)
         g[tau-1, :] = 1 + np.log(s_p[tau-1, :]) - oA - mt.logB_s(B,s_p[tau-2, :])
     return g
 
-def gradF_v(s_emo, s_p, oE, oP, A, Ap, D, B_emo, B_act, tau, T=pm.T):
+def gradF_v(s_emo, s_p, oE, oP, A, Ap, D, B_emo, B_act, tau, T=pm.T, nemo=pm.N_states_emo):
     """
     Calcul du gradient de l'énergie libre suivant la variable v
 
@@ -137,14 +139,16 @@ def gradF_v(s_emo, s_p, oE, oP, A, Ap, D, B_emo, B_act, tau, T=pm.T):
             Time of states
         T :     integer
             Time of observation
+        nemo:   integer
+            Number of emotional states
 
     Output
     -------
         [list : vector * vector]
             Gradient selon s_emotionnel et s_ressenti
     """
-    f = gradF_s(s_emo, oE, A, D[0:pm.N_states_emo], B_emo, tau, T)
-    g = gradF_sp(s_emo, s_p, oP, Ap, D[pm.N_states_emo:], B_act, tau, T)
+    f = gradF_s(s_emo, oE, A, D[0:nemo], B_emo, tau, T)
+    g = gradF_sp(s_emo, s_p, oP, Ap, D[nemo:], B_act, tau, T, nemo)
 
 
     for i in range(tau):
